@@ -44,8 +44,32 @@ async function getLeadByPhone(phone) {
     patch.initialVariant = null;
   }
 
+  if (!Object.prototype.hasOwnProperty.call(data, "conversationStage")) {
+    patch.conversationStage = null;
+  }
+
   if (typeof data.followUpSent !== "boolean") {
     patch.followUpSent = false;
+  }
+
+  if (typeof data.stageAttempts !== "number") {
+    patch.stageAttempts = 0;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(data, "vehicleInterest")) {
+    patch.vehicleInterest = null;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(data, "purchaseTiming")) {
+    patch.purchaseTiming = null;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(data, "hasInitialCapital")) {
+    patch.hasInitialCapital = null;
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(data, "city")) {
+    patch.city = null;
   }
 
   if (!data.createdAt) {
@@ -80,7 +104,13 @@ async function createLead(phone) {
     phone,
     name: null,
     initialVariant: null,
+    conversationStage: null,
     followUpSent: false,
+    stageAttempts: 0,
+    vehicleInterest: null,
+    purchaseTiming: null,
+    hasInitialCapital: null,
+    city: null,
     status: LEAD_STATUSES.NEW,
     state: LEAD_STATUSES.NEW,
     stage: LEAD_STAGES.NEW,

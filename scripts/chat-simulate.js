@@ -36,6 +36,12 @@ async function run() {
     console.log(`User: ${userMessage}`);
     console.log(`Bot : ${result.reply || "(sin respuesta)"}`);
     console.log(`Action: ${result.lead ? result.lead.stage : "n/a"}`);
+    console.log(`ConversationStage: ${result.lead ? result.lead.conversationStage : "n/a"}`);
+    console.log(`StageAttempts: ${result.lead && typeof result.lead.stageAttempts === "number" ? result.lead.stageAttempts : "n/a"}`);
+    console.log(`VehicleInterest: ${result.lead ? result.lead.vehicleInterest : "n/a"}`);
+    console.log(`PurchaseTiming: ${result.lead ? result.lead.purchaseTiming : "n/a"}`);
+    console.log(`HasInitialCapital: ${result.lead ? result.lead.hasInitialCapital : "n/a"}`);
+    console.log(`City: ${result.lead ? result.lead.city : "n/a"}`);
     console.log(`Status: ${result.lead ? result.lead.status : "n/a"}`);
   }
 

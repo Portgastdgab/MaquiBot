@@ -107,6 +107,7 @@ async function processIncomingMessage(payload) {
       lead,
       phone,
       isFirstUserMessage,
+      currentMessage: text,
       businessName: env.businessName,
       scheduleLink: env.scheduleLink,
       leadService: {

@@ -1,5 +1,7 @@
 const { LEAD_STAGES } = require("../lead/lead.constants");
 const { ACTIONS } = require("./conversation.actions");
+const { CONVERSATION_STAGES } = require("./conversation.stages");
+const { STAGE_CONFIG } = require("./conversation.stage.config");
 
 function looksLikeName(text = "") {
   const value = String(text).trim();
@@ -101,9 +103,35 @@ function detectIntent(messageText = "") {
   };
 }
 
+function detectObjection(messageText = "") {
+  const text = String(messageText || "").toLowerCase().trim();
+  if (!text) {
+    return null;
+  }
+
+  if (/(no tengo inicial|sin inicial|no cuento con inicial|no tengo ahorrado|no tengo cuota inicial)/i.test(text)) {
+    return "NO_INITIAL";
+  }
+
+  if (/(caro|precio alto|muy caro|tasa alta|cuota alta)/i.test(text)) {
+    return "PRICE";
+  }
+
+  if (/(estoy viendo|evaluando opciones|comparando|cotizando|viendo opciones)/i.test(text)) {
+    return "EXPLORING";
+  }
+
+  if (/(solo info|solo informacion|solo información|quiero info|como funciona|cómo funciona)/i.test(text)) {
+    return "INFO_ONLY";
+  }
+
+  return null;
+}
+
 function decideNextStep({ lead, message }) {
   const cleanMessage = String(message || "").trim();
   const intent = detectIntent(cleanMessage);
+  const objectionType = detectObjection(cleanMessage);
   const extractedName = extractNameFromMessage(cleanMessage);
   const leadHasValidName = hasValidLeadName(lead.name);
 
@@ -137,6 +165,53 @@ function decideNextStep({ lead, message }) {
     };
   }
 
+  if (!lead.conversationStage) {
+    return {
+      action: ACTIONS.START_CONVERSATION_FLOW,
+      data: {
+        nextStage: CONVERSATION_STAGES.ASK_VEHICLE,
+        intent
+      }
+    };
+  }
+
+  if (objectionType) {
+    return {
+      action: ACTIONS.HANDLE_OBJECTION,
+      data: {
+        type: objectionType,
+        stage: lead.conversationStage,
+        intent
+      }
+    };
+  }
+
+  const stageConfig = STAGE_CONFIG[lead.conversationStage];
+  if (stageConfig) {
+    const isValid = stageConfig.validate(cleanMessage);
+
+    if (!isValid) {
+      return {
+        action: ACTIONS.REPEAT_STAGE,
+        data: {
+          stage: lead.conversationStage,
+          nextStage: stageConfig.next,
+          fallback: stageConfig.fallback,
+          intent
+        }
+      };
+    }
+
+    return {
+      action: ACTIONS.ADVANCE_STAGE,
+      data: {
+        currentStage: lead.conversationStage,
+        nextStage: stageConfig.next,
+        intent
+      }
+    };
+  }
+
   if (lead.stage === LEAD_STAGES.QUALIFICATION) {
     return {
       action: ACTIONS.QUALIFY_LEAD,
@@ -165,6 +240,7 @@ function decideNextStep({ lead, message }) {
 
 module.exports = {
   detectIntent,
+  detectObjection,
   extractNameFromMessage,
   hasValidLeadName,
   decideNextStep
