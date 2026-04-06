@@ -1,0 +1,30 @@
+{
+  "name": "maquibot-backend",
+  "version": "1.0.0",
+  "description": "Backend modular monolith for MaquiBot WhatsApp lead conversion",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "dev:clean": "bash -lc 'for i in 1 2 3 4 5; do pids=$(lsof -ti:3000 2>/dev/null); if [ -z \"$pids\" ]; then break; fi; kill $pids 2>/dev/null || true; sleep 0.2; done; pids=$(lsof -ti:3000 2>/dev/null); if [ -n \"$pids\" ]; then kill -9 $pids 2>/dev/null || true; fi; nodemon src/server.js'",
+    "twilio:test": "node scripts/send-test-message.js",
+    "firebase:test": "node scripts/firestore-smoke-test.js",
+    "e2e:verify": "node scripts/e2e-verify.js",
+    "followup:run": "node scripts/run-followup.js",
+    "chat:simulate": "node scripts/chat-simulate.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "axios": "^1.14.0",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "firebase-admin": "^12.4.0",
+    "puppeteer": "^24.5.0",
+    "twilio": "^5.3.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
